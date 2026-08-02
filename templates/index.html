@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numerical Interpolation Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23202b23'/><text x='50' y='68' font-size='40' font-family='sans-serif' font-style='italic' font-weight='bold' fill='%23f3f2ec' text-anchor='middle'>f(x)</text></svg>" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <header class="masthead">
+      <div class="masthead-left">
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Navigation">☰</button>
+        <a href="/" class="back-link">&larr; Back to Dashboard</a>
+        <h1 style="margin-top: 12px;">Numerical Interpolation Calculator</h1>
+        <p class="subhead">Forward, Backward, Divided Difference &amp; Lagrange Interpolation</p>
+      </div>
+      <div class="masthead-right" style="display: flex; flex-direction: column; align-items: flex-end;">
+        <div class="theme-toggle" id="themeToggle" style="margin-bottom: 12px; border: none; background: transparent;">
+          <button type="button" id="singleThemeBtn" aria-label="Toggle theme" title="Toggle Theme">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="/">Dashboard</a>
+      <a href="/interpolation">Interpolation Calculator</a>
+      <a href="/roots">Root Finding Methods</a>
+    </nav>
+
+    <main class="workspace">
+
+      <!-- LEFT: INPUT PANEL -->
+      <section class="panel input-panel">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
+          <h2 class="panel-title" style="margin: 0;"><span class="tick">&#9998;</span> Data points</h2>
+          <button type="button" class="ghost-btn" id="clearData" style="color: var(--danger-color, #e74c3c); font-size: 0.9em; padding: 4px 8px;">Clear</button>
+        </div>
+
+        <table class="points-table" id="pointsTable">
+          <thead>
+            <tr>
+              <th>x</th>
+              <th>y = f(x)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pointsBody"></tbody>
+        </table>
+
+        <div class="row-controls">
+          <button type="button" class="ghost-btn" id="addRow">+ add point</button>
+          <button type="button" class="ghost-btn" id="loadExample">load example</button>
+        </div>
+
+        <div class="field">
+          <label for="targetX">Interpolate at x =</label>
+          <input type="text" id="targetX" placeholder="e.g. 1.5" inputmode="decimal">
+        </div>
+
+        <div class="field">
+          <label>Method</label>
+          <div class="method-toggle" id="methodToggle" style="flex-wrap: wrap;">
+            <button type="button" class="method-opt active" data-method="auto" style="flex: 1 1 33%;">Auto</button>
+            <button type="button" class="method-opt" data-method="forward" style="flex: 1 1 33%;">Forward</button>
+            <button type="button" class="method-opt" data-method="backward" style="flex: 1 1 33%; border-right: none;">Backward</button>
+            <button type="button" class="method-opt" data-method="divided_difference" style="flex: 1 1 50%; border-top: 1px solid var(--rule);">Divided Diff</button>
+            <button type="button" class="method-opt" data-method="lagrange" style="flex: 1 1 50%; border-right: none; border-top: 1px solid var(--rule);">Lagrange</button>
+          </div>
+          <p class="hint">Auto picks forward/backward for equal spacing, or divided differences for unequal data.</p>
+        </div>
+
+        <button type="button" class="stamp-btn" id="calcBtn">Calculate</button>
+
+        <p class="error-msg" id="errorMsg" hidden></p>
+      </section>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="panel results-panel" id="resultsPanel">
+        <div class="empty-state" id="emptyState">
+          <svg viewBox="0 0 200 120" class="empty-illustration" aria-hidden="true">
+            <line x1="20" y1="100" x2="180" y2="100" stroke="currentColor" stroke-width="1" />
+            <line x1="20" y1="100" x2="20" y2="10" stroke="currentColor" stroke-width="1" />
+            <circle cx="40" cy="80" r="3" fill="currentColor" />
+            <circle cx="75" cy="55" r="3" fill="currentColor" />
+            <circle cx="110" cy="60" r="3" fill="currentColor" />
+            <circle cx="145" cy="30" r="3" fill="currentColor" />
+            <path d="M40 80 Q 75 40 110 60 T 145 30" fill="none" stroke="currentColor" stroke-width="1"
+              stroke-dasharray="3 4" opacity="0.5" />
+          </svg>
+          <p>Enter your data points and press <strong>Calculate</strong> to see the difference table and worked solution.</p>
+        </div>
+
+        <div class="results-content" id="resultsContent" hidden>
+          <div class="result-summary">
+            <div class="summary-item">
+              <span class="summary-label">Method used</span>
+              <span class="summary-value" id="methodUsed">&mdash;</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Step size h</span>
+              <span class="summary-value" id="hValue">&mdash;</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">p</span>
+              <span class="summary-value" id="pValue">&mdash;</span>
+            </div>
+          </div>
+          <p class="p-formula" id="pFormula"></p>
+
+          <h3 class="section-label" id="diffTableHeading">Difference table</h3>
+          <p class="section-note" id="diffTableNote">The highlighted diagonal is the exact path the formula reads from.</p>
+          <div class="table-scroll" id="diffTableContainer">
+            <div id="diffTableWrap"></div>
+          </div>
+
+          <h3 class="section-label" id="formulaHeading" hidden>General Formula</h3>
+          <div id="formulaWrap" hidden></div>
+
+          <h3 class="section-label" id="stepsHeading" hidden>Step-by-step substitution</h3>
+          <div id="stepsWrap" class="steps-wrap"></div>
+
+          <div class="final-answer" id="finalAnswer"></div>
+
+          <div class="chart-container" style="margin-top: 32px; position: relative; height: 350px; width: 100%;">
+            <canvas id="interpolationChart"></canvas>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="foot-note">
+      <span>Numerical Methods &middot; Numerical Interpolation Calculator</span>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

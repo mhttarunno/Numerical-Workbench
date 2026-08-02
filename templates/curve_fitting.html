@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curve Fitting Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23202b23'/><text x='50' y='68' font-size='40' font-family='sans-serif' font-style='italic' font-weight='bold' fill='%23f3f2ec' text-anchor='middle'>f(x)</text></svg>" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <header class="masthead">
+      <div class="masthead-left">
+        <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Navigation">☰</button>
+        <a href="/" class="back-link">&larr; Back to Dashboard</a>
+        <h1 style="margin-top: 12px;">Curve Fitting Calculator</h1>
+        <p class="subhead">Linear, Polynomial, Exponential, Logarithmic &amp; Power Fit</p>
+      </div>
+      <div class="masthead-right" style="display: flex; flex-direction: column; align-items: flex-end;">
+        <div class="theme-toggle" id="themeToggle" style="margin-bottom: 12px; border: none; background: transparent;">
+          <button type="button" id="singleThemeBtn" aria-label="Toggle theme" title="Toggle Theme">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="/">Dashboard</a>
+      <a href="/interpolation">Interpolation Calculator</a>
+      <a href="/roots">Root Finding Methods</a>
+      <a href="/curve-fitting">Curve Fitting</a>
+    </nav>
+
+    <main class="workspace">
+
+      <!-- LEFT: INPUT PANEL -->
+      <section class="panel input-panel">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
+          <h2 class="panel-title" style="margin: 0;"><span class="tick">&#9998;</span> Data points</h2>
+          <button type="button" class="ghost-btn" id="clearData"
+            style="color: var(--danger-color, #e74c3c); font-size: 0.9em; padding: 4px 8px;">Clear</button>
+        </div>
+
+        <table class="points-table" id="pointsTable">
+          <thead>
+            <tr>
+              <th>x</th>
+              <th>y</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pointsBody"></tbody>
+        </table>
+
+        <div class="row-controls">
+          <button type="button" class="ghost-btn" id="addRow">+ add point</button>
+          <button type="button" class="ghost-btn" id="loadExample">load example</button>
+        </div>
+
+        <div class="field">
+          <label for="targetX">Estimate y when x = <span
+              style="opacity: 0.6; font-size: 0.85em; font-weight: normal;">(Optional)</span></label>
+          <input type="text" id="targetX" placeholder="e.g. 25" inputmode="decimal">
+        </div>
+
+        <div class="field" id="linearFormWrap" style="display: none;">
+          <label for="linearForm">Linear Equation Form</label>
+          <select id="linearForm" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text);">
+            <option value="ax+b">y = ax + b</option>
+            <option value="a+bx">y = a + bx</option>
+          </select>
+        </div>
+
+        <div class="field" id="expFormWrap" style="display: none;">
+          <label for="expForm">Exponential Equation Form</label>
+          <select id="expForm" style="border: none; background: transparent; padding-left: 0; box-shadow: none; outline: none; color: inherit;">
+            <option value="ae^bx">y = a e^(bx)</option>
+            <option value="ab^x">y = a b^x</option>
+          </select>
+        </div>
+
+        <div class="field" id="polyDegreeWrap" style="display: none;">
+          <label for="polyDegree">Polynomial Degree (m)</label>
+          <input type="number" id="polyDegree" value="2" min="1" max="10">
+        </div>
+
+        <div class="field">
+          <label>Least Square Method (Curve Type)</label>
+          <div class="method-toggle" id="methodToggle" style="flex-wrap: wrap;">
+            <button type="button" class="method-opt active" data-method="best_fit" style="flex: 1 1 33%;">Best
+              Fit</button>
+            <button type="button" class="method-opt" data-method="linear" style="flex: 1 1 33%;">Linear</button>
+            <button type="button" class="method-opt" data-method="polynomial"
+              style="flex: 1 1 33%; border-right: none;">Polynomial</button>
+            <button type="button" class="method-opt" data-method="exponential"
+              style="flex: 1 1 33%; border-top: 1px solid var(--rule);">Exponential</button>
+            <button type="button" class="method-opt" data-method="logarithmic"
+              style="flex: 1 1 33%; border-top: 1px solid var(--rule);">Logarithmic</button>
+            <button type="button" class="method-opt" data-method="power"
+              style="flex: 1 1 33%; border-right: none; border-top: 1px solid var(--rule);">Power</button>
+          </div>
+
+          <p class="hint">Best Fit automatically selects the model with the highest R² value.</p>
+        </div>
+
+        <button type="button" class="stamp-btn" id="calcBtn">Calculate Fit</button>
+
+        <p class="error-msg" id="errorMsg" hidden></p>
+      </section>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="panel results-panel" id="resultsPanel">
+        <div class="empty-state" id="emptyState">
+          <svg viewBox="0 0 200 120" class="empty-illustration" aria-hidden="true">
+            <!-- Axes -->
+            <line x1="20" y1="100" x2="180" y2="100" stroke="currentColor" stroke-width="1" />
+            <line x1="20" y1="100" x2="20" y2="10" stroke="currentColor" stroke-width="1" />
+
+            <!-- Scatter Data Points -->
+            <circle cx="45" cy="85" r="3" fill="currentColor" />
+            <circle cx="75" cy="45" r="3" fill="currentColor" />
+            <circle cx="105" cy="75" r="3" fill="currentColor" />
+            <circle cx="135" cy="35" r="3" fill="currentColor" />
+            <circle cx="165" cy="50" r="3" fill="currentColor" />
+
+            <!-- Best Fit Line -->
+            <line x1="30" y1="85" x2="180" y2="25" stroke="currentColor" stroke-width="2" stroke-dasharray="5 5"
+              opacity="0.6" />
+          </svg>
+          <p>Enter your data points and press <strong>Calculate Fit</strong> to see the curve equation and plot.</p>
+        </div>
+
+        <div class="results-content" id="resultsContent" hidden>
+          <div class="result-summary" style="display: flex; gap: 24px; flex-wrap: wrap;">
+            <div class="summary-item">
+              <span class="summary-label">Method Used</span>
+              <span class="summary-value" id="methodUsed">&mdash;</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">R² (Goodness of Fit)</span>
+              <span class="summary-value" id="rSquaredValue">&mdash;</span>
+            </div>
+          </div>
+
+          <div id="stepsWrap" style="display: none; margin-bottom: 24px;"></div>
+
+          <h3 class="section-label" id="formulaHeading">Fitted Equation</h3>
+          <div id="formulaWrap" class="final-answer"></div>
+
+          <div id="estimateResultBox" class="final-answer" style="margin-top: 16px; display: none;"></div>
+
+          <div class="chart-container" style="margin-top: 32px; position: relative; height: 400px; width: 100%;">
+            <canvas id="curveChart"></canvas>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="foot-note">
+      <span>Numerical Methods &middot; Curve Fitting Calculator</span>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='curve_fitting.js') }}"></script>
+</body>
+
+</html>

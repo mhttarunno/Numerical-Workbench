@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numerical Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23202b23'/><text x='50' y='68' font-size='40' font-family='sans-serif' font-style='italic' font-weight='bold' fill='%23f3f2ec' text-anchor='middle'>f(x)</text></svg>" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-body">
+
+  <!-- Theme Toggle for the Dashboard -->
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <button type="button" id="singleThemeBtn" class="dashboard-theme-btn" aria-label="Toggle theme"
+      title="Toggle Theme">
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Background container for floating math symbols -->
+  <div id="mathBgContainer" class="math-bg-container"></div>
+
+  <div class="dashboard-wrapper">
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Numerical Workbench</h1>
+      <p class="dashboard-subtitle">Select a computational module to begin</p>
+    </header>
+
+    <div class="card-grid">
+      <!-- Card 1: Interpolation -->
+      <a href="/interpolation" class="nav-card">
+        <div class="nav-card-icon">
+          <!-- Math function icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div class="nav-card-content">
+          <h3>Interpolation Calculator</h3>
+          <p>Calculate interpolated values using Forward Difference, Backward Difference, Divided Difference, and
+            Lagrange Interpolation.</p>
+        </div>
+      </a>
+
+      <!-- Card 2: Root Finding -->
+      <a href="/roots" class="nav-card">
+        <div class="nav-card-icon">
+          <!-- Crosshair/Root icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </div>
+        <div class="nav-card-content">
+          <h3>Root Finding Calculator</h3>
+          <p>Find the roots of equations using multiple numerical methods such as Bisection Method, False Position,
+            Newton-Raphson Method, and Fixed Point Iteration.</p>
+        </div>
+      </a>
+
+      <!-- Card 3: Curve Fitting -->
+      <a href="/curve-fitting" class="nav-card">
+        <div class="nav-card-icon">
+          <!-- Trending Up / Curve icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+        </div>
+        <div class="nav-card-content">
+          <h3>Curve Fitting Calculator</h3>
+          <p>Calculate best fit curves using Least Squares Method for Linear, Polynomial, Exponential, Logarithmic, and
+            Power models.</p>
+        </div>
+      </a>
+
+      <!-- Card 4: Linear Equations -->
+      <a href="/linear-equations" class="nav-card">
+        <div class="nav-card-icon">
+          <!-- Grid/Matrix icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+          </svg>
+        </div>
+        <div class="nav-card-content">
+          <h3>Solve Systems Of Linear Equations</h3>
+          <p>Solve simultaneous linear equations using Gauss Jordan Elimination, Gauss Jacobi Elimination, and Gauss
+            Seidal Elimination.</p>
+        </div>
+      </a>
+    </div>
+
+    <footer class="dashboard-footer">
+      <span>Created by <strong style="font-weight: 600;">Mahfujul Haque Tarunno</strong></span>
+    </footer>
+  </div>
+
+  <script>
+    // Minimal script for dashboard theme toggle
+    const themeBtn = document.getElementById("singleThemeBtn");
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('newton_theme', theme);
+    }
+    const saved = localStorage.getItem("newton_theme") || "light";
+    setTheme(saved);
+
+    if (themeBtn) {
+      themeBtn.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+    }
+
+    // Floating Math Background Logic
+    const mathSymbols = ['&int;', '&sum;', '&Delta;', '&nabla;', 'f(x)', '&pi;', '&infin;', '&alpha;', '&beta;', 'x&sup2;', '&radic;'];
+    const bgContainer = document.getElementById('mathBgContainer');
+
+    function createMathSymbol() {
+      const el = document.createElement('div');
+      el.className = 'floating-math';
+      el.innerHTML = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
+
+      // Randomize position, size, and animation duration
+      const leftPos = Math.random() * 100;
+      const size = Math.random() * 2 + 1; // 1rem to 3rem
+      const duration = Math.random() * 10 + 10; // 10s to 20s
+      const delay = Math.random() * 5;
+
+      el.style.left = `${leftPos}%`;
+      el.style.fontSize = `${size}rem`;
+      el.style.animationDuration = `${duration}s`;
+      el.style.animationDelay = `${delay}s`;
+
+      bgContainer.appendChild(el);
+
+      // Remove element after it floats up to prevent DOM bloat
+      setTimeout(() => {
+        el.remove();
+      }, (duration + delay) * 1000);
+    }
+
+    // Spawn symbols initially and periodically
+    for (let i = 0; i < 15; i++) {
+      createMathSymbol();
+    }
+    setInterval(createMathSymbol, 2000);
+
+  </script>
+</body>
+
+</html>
