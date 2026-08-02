@@ -50,7 +50,7 @@ A modern, high-performance web application built for **Numerical Methods** cours
 - **Backend**: Python 3.x, Flask, SymPy (Symbolic Mathematics & Algebraic Derivations).
 - **Frontend**: HTML5, Vanilla CSS3 (Dark/Light Design System), JavaScript (ES6+).
 - **Typesetting & Graphics**: **KaTeX** (Textbook-quality math rendering), **Chart.js** (Interactive plotting).
-- **Deployment**: Vercel Serverless Function configuration (`@vercel/python`).
+- **Deployment**: Vercel Serverless Function architecture via `api/index.py` entry point and modern `vercel.json` rewrites.
 
 ---
 
